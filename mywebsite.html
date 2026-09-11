@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vidhathri Vaidya — dev terminal</title>
+<style>
+  :root{
+    --bg: #0c0d0a;
+    --bg-raised: #121309;
+    --amber: #ffb000;
+    --amber-dim: #a86f00;
+    --cyan: #6fd6c9;
+    --text: #e8e0c8;
+    --text-dim: #7a7364;
+    --border: #2b2a1f;
+    font-size: 16px;
+  }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono','Space Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+    line-height: 1.55;
+    min-height: 100vh;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 2px);
+  }
+  ::selection{ background: var(--amber); color: #0c0d0a; }
+
+  a{ color: var(--cyan); text-decoration: none; border-bottom: 1px dotted var(--cyan); }
+  a:hover{ color: var(--amber); border-color: var(--amber); }
+
+  .crt-frame{
+    max-width: 820px;
+    margin: 40px auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-raised);
+    box-shadow: 0 0 0 1px rgba(255,176,0,0.04), 0 40px 80px -40px rgba(0,0,0,0.8);
+    overflow: hidden;
+  }
+  .titlebar{
+    display:flex; align-items:center; gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: #0f100a;
+  }
+  .dot{ width:10px; height:10px; border-radius:50%; }
+  .dot.r{ background:#5c3a2e; } .dot.y{ background:#5c4a2e; } .dot.g{ background:#2e5c3a; }
+  .titlebar span{ margin-left: 10px; color: var(--text-dim); font-size: 0.8rem; }
+
+  nav{
+    display:flex; gap: 18px; flex-wrap: wrap;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  nav a{ color: var(--text-dim); border: none; }
+  nav a:hover{ color: var(--amber); }
+  nav a::before{ content: "/"; color: var(--border); margin-right: 4px; }
+
+  main{ padding: 32px 28px 60px; }
+  section{ padding: 46px 0; border-top: 1px solid var(--border); }
+  section:first-of-type{ border-top: none; padding-top: 8px; }
+
+  .prompt{ color: var(--cyan); }
+  .prompt::before{ content: "vidhathri@dev:~$ "; color: var(--amber-dim); }
+
+  h1{
+    font-size: 1.9rem;
+    color: var(--amber);
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+  h2{
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  h2 .prompt{ display:block; margin-bottom: 6px; }
+
+  .cursor{
+    display:inline-block; width: 9px; height: 1.1em;
+    background: var(--amber); vertical-align: text-bottom;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity: 0; } }
+
+  .tagline{ color: var(--text); max-width: 60ch; margin-top: 10px; }
+  .tagline .hl{ color: var(--cyan); }
+
+  .field{ display:grid; grid-template-columns: 110px 1fr; gap: 4px 12px; max-width: 480px; margin-top: 18px; font-size: 0.92rem;}
+  .field dt{ color: var(--text-dim); }
+  .field dd{ color: var(--text); }
+
+  .skills-grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap: 10px 18px; margin-top: 10px;}
+  .skill{ font-size: 0.9rem; color: var(--text); border-left: 2px solid var(--border); padding-left: 10px; }
+  .skill .lvl{ color: var(--text-dim); font-size: 0.78rem; display:block; }
+
+  .project{
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    background: rgba(255,176,0,0.015);
+    transition: border-color .15s ease;
+  }
+  .project:hover{ border-color: var(--amber-dim); }
+  .project h3{ color: var(--amber); font-size: 1.02rem; font-weight: 600; margin-bottom: 6px; }
+  .project .meta{ color: var(--text-dim); font-size: 0.78rem; margin-bottom: 10px; }
+  .project p{ font-size: 0.92rem; }
+  .tags{ margin-top: 12px; display:flex; flex-wrap:wrap; gap: 8px; }
+  .tag{ font-size: 0.72rem; color: var(--cyan); border: 1px solid var(--border); padding: 2px 8px; border-radius: 3px; }
+
+  .contact-list{ margin-top: 16px; display:flex; flex-direction:column; gap: 8px; font-size: 0.92rem; }
+  .contact-list a{ color: var(--text); }
+  .contact-list a:hover{ color: var(--amber); }
+  .contact-list .k{ color: var(--text-dim); }
+
+  footer{
+    border-top: 1px solid var(--border);
+    padding: 18px 24px;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    display:flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  @media (max-width: 560px){
+    .crt-frame{ margin: 0; border-radius: 0; }
+    main{ padding: 24px 18px 48px; }
+    .field{ grid-template-columns: 90px 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="crt-frame">
+  <div class="titlebar">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <span>Vidhathri Vaidya — /home/vidhathri — 80x24</span>
+  </div>
+
+  <nav>
+    <a href="#about">about</a>
+    <a href="#skills">skills</a>
+    <a href="#projects">projects</a>
+    <a href="#academics">academics</a>
+    <a href="#activities">activities</a>
+    <a href="#contact">contact</a>
+  </nav>
+
+  <main>
+    <section id="about">
+      <p class="prompt">whoami</p>
+      <h1>Vidhathri Vaidya<span class="cursor"></span></h1>
+      <h2>Vidhathri Vaidya · Information Science student</h2>
+      <p class="tagline">Led team <span class="hl">Agronex</span> as team leader through the Smart India Hackathon (SIH) ideathon. Into systems that connect messy real-world data to something people can actually use.</p>
+
+      <dl class="field">
+        <dt>name</dt><dd>Vidhathri Vaidya</dd>
+        <dt>role</dt><dd>Info Science student</dd>
+        <dt>team led</dt><dd>Agronex — SIH ideathon</dd>
+        <dt>status</dt><dd><span style="color:var(--cyan)">●</span> open to opportunities</dd>
+      </dl>
+    </section>
+
+    <section id="skills">
+      <h2><span class="prompt">ls skills/</span></h2>
+      <div class="skills-grid">
+        <div class="skill">C<span class="lvl">-rwxr-xr-x</span></div>
+        <div class="skill">Python<span class="lvl">-rwxr-xr-x</span></div>
+        <div class="skill">Java<span class="lvl">-rwxr-xr-x</span></div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2><span class="prompt">cat projects.log</span></h2>
+
+      <div class="project">
+        <h3>Agronex</h3>
+        <div class="meta">Smart India Hackathon (SIH) · Ideathon · Team Lead</div>
+        <p>Led a team through SIH's ideathon stage, taking an agriculture-focused concept from problem statement to pitch.</p>
+        <div class="tags"><span class="tag">team leadership</span><span class="tag">agritech</span><span class="tag">SIH</span></div>
+      </div>
+
+    </section>
+
+    <section id="academics">
+      <h2><span class="prompt">cat academics.txt</span></h2>
+      <dl class="field">
+        <dt>10th grade</dt><dd>98%</dd>
+        <dt>12th grade</dt><dd>90%</dd>
+        <dt>1st yr CGPA</dt><dd>8.3</dd>
+      </dl>
+    </section>
+
+    <section id="activities">
+      <h2><span class="prompt">ls activities/</span></h2>
+      <div class="project">
+        <h3>Singing</h3>
+        <p>Completed Junior level in Hindustani classical vocal exams. Participated in the SA RE GA MA PA audition and made it to the last selection round.</p>
+        <div class="tags"><span class="tag">Hindustani classical</span><span class="tag">SA RE GA MA PA</span></div>
+      </div>
+      <div class="project">
+        <h3>Drawing</h3>
+        <p>Completed the Drawing board exam with distinction.</p>
+        <div class="tags"><span class="tag">distinction</span></div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2><span class="prompt">cat contact.txt</span></h2>
+      <div class="contact-list">
+        <div><span class="k">email</span> — <a href="mailto:vsvidhu07@gmail.com">vsvidhu07@gmail.com</a></div>
+        <div><span class="k">github</span> — <a href="https://github.com/vsvaidya07" target="_blank" rel="noopener">github.com/vsvaidya07</a></div>
+        <div><span class="k">linkedin</span> — <a href="https://linkedin.com/in/vidhathri-vaidya" target="_blank" rel="noopener">linkedin.com/in/vidhathri-vaidya</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>built by Vidhathri Vaidya</span>
+    <span>process exited 0</span>
+  </footer>
+</div>
+
+</body>
+</html>
